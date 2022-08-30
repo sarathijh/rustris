@@ -1,6 +1,7 @@
 pub mod board;
 pub mod game;
 pub mod input;
+pub mod keyboard_query;
 pub mod piece;
 pub mod position;
 pub mod queue;

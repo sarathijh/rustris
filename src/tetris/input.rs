@@ -1,5 +1,3 @@
-use keyboard_query::{DeviceQuery, DeviceState};
-
 #[derive(Eq, PartialEq)]
 pub enum Input {
     LeftPress,
@@ -14,65 +12,8 @@ pub enum Input {
     Hold,
 }
 
-pub struct InputSource {
-    device_state: DeviceState,
-    prev_keys: Vec<u16>,
-}
-
-impl InputSource {
-    pub fn new() -> Self {
-        Self {
-            device_state: DeviceState::new(),
-            prev_keys: vec![],
-        }
-    }
-
-    pub fn inputs(&mut self) -> Vec<Input> {
-        let keys = self.device_state.get_keys();
-        let mut inputs = Vec::<Input>::new();
-        if keys != self.prev_keys {
-            if self.is_press(&keys, 123) {
-                inputs.push(Input::LeftPress);
-            }
-            if self.is_release(&keys, 123) {
-                inputs.push(Input::LeftRelease);
-            }
-            if self.is_press(&keys, 124) {
-                inputs.push(Input::RightPress);
-            }
-            if self.is_release(&keys, 124) {
-                inputs.push(Input::RightRelease);
-            }
-            if self.is_press(&keys, 125) {
-                inputs.push(Input::SoftDropPress);
-            }
-            if self.is_release(&keys, 125) {
-                inputs.push(Input::SoftDropRelease);
-            }
-            if self.is_press(&keys, 126) {
-                inputs.push(Input::HardDrop);
-            }
-            if self.is_press(&keys, 6) {
-                inputs.push(Input::RotateLeft);
-            }
-            if self.is_press(&keys, 7) {
-                inputs.push(Input::RotateRight);
-            }
-            if self.is_press(&keys, 56) {
-                inputs.push(Input::Hold);
-            }
-        }
-        self.prev_keys = keys;
-        inputs
-    }
-
-    fn is_press(&self, keys: &Vec<u16>, key: u16) -> bool {
-        !self.prev_keys.contains(&key) && keys.contains(&key)
-    }
-
-    fn is_release(&self, keys: &Vec<u16>, key: u16) -> bool {
-        self.prev_keys.contains(&key) && !keys.contains(&key)
-    }
+pub trait InputSource {
+    fn inputs(&mut self) -> Vec<Input>;
 }
 
 #[derive(Eq, PartialEq)]
@@ -91,8 +32,8 @@ pub trait InputActions {
     fn actions(&mut self, delta_time: f64) -> Vec<Action>;
 }
 
-pub struct DasInputActions {
-    input_source: InputSource,
+pub struct DasInputActions<TInputSource: InputSource> {
+    input_source: TInputSource,
     delayed_auto_shift: f64,
     auto_repeat_rate: f64,
     auto_shift_timer: f64,
@@ -100,10 +41,10 @@ pub struct DasInputActions {
     holding_right: bool,
 }
 
-impl DasInputActions {
-    pub fn new(delayed_auto_shift: f64, auto_repeat_rate: f64) -> Self {
+impl<TInputSource: InputSource> DasInputActions<TInputSource> {
+    pub fn new(input_source: TInputSource, delayed_auto_shift: f64, auto_repeat_rate: f64) -> Self {
         Self {
-            input_source: InputSource::new(),
+            input_source: input_source,
             delayed_auto_shift,
             auto_repeat_rate,
             auto_shift_timer: 0f64,
@@ -128,7 +69,7 @@ impl DasInputActions {
     }
 }
 
-impl InputActions for DasInputActions {
+impl<TInputSource: InputSource> InputActions for DasInputActions<TInputSource> {
     fn actions(&mut self, delta_time: f64) -> Vec<Action> {
         let inputs = self.input_source.inputs();
         let mut actions = Vec::<Action>::new();

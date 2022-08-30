@@ -13,6 +13,7 @@ use termion::{
 
 use super::{
     board::Board,
+    input::{Action, InputActions},
     piece::{Direction, Piece, PieceSet, PieceType, Rotation},
     position::Position,
     queue::Queue,
@@ -25,8 +26,9 @@ const BOARD_VISIBLE_HEIGHT: usize = 20;
 pub fn tetris<TPieceSet: PieceSet, TRandom: Random<PieceType>>(
     piece_set: TPieceSet,
     queue: Queue<PieceType, TRandom>,
+    input_actions: InputActions,
 ) {
-    let mut game = TetrisGame::new(piece_set, queue);
+    let mut game = TetrisGame::new(piece_set, queue, input_actions);
     game.start();
 
     game_loop(
@@ -43,6 +45,7 @@ struct TetrisGame<TPieceSet: PieceSet, TRandom: Random<PieceType>> {
     piece_set: TPieceSet,
     active_piece: Option<Piece>,
     queue: Queue<PieceType, TRandom>,
+    input_actions: InputActions,
 
     stdout: RawTerminal<Stdout>,
     stdin: Keys<AsyncReader>,
@@ -52,12 +55,17 @@ struct TetrisGame<TPieceSet: PieceSet, TRandom: Random<PieceType>> {
 }
 
 impl<TPieceSet: PieceSet, TRandom: Random<PieceType>> TetrisGame<TPieceSet, TRandom> {
-    fn new(piece_set: TPieceSet, queue: Queue<PieceType, TRandom>) -> Self {
+    fn new(
+        piece_set: TPieceSet,
+        queue: Queue<PieceType, TRandom>,
+        input_actions: InputActions,
+    ) -> Self {
         TetrisGame {
             board: Board::new(),
             piece_set,
             active_piece: None,
             queue,
+            input_actions,
             stdout: stdout().into_raw_mode().unwrap(),
             stdin: termion::async_stdin().keys(),
             drop_timer: 0f64,
@@ -81,19 +89,31 @@ impl<TPieceSet: PieceSet, TRandom: Random<PieceType>> TetrisGame<TPieceSet, TRan
     }
 
     fn update(&mut self, delta_time: f64) {
-        let input = self.stdin.next();
-        if let Some(Ok(key)) = input {
-            let _ = match key {
-                Key::Left => self.move_active_piece(Position::new(-1, 0)),
-                Key::Right => self.move_active_piece(Position::new(1, 0)),
-                Key::Down => self.move_active_piece(Position::new(0, -1)),
-                Key::Up => {
-                    self.hard_drop_active_piece();
-                    false
+        let actions = self.input_actions.actions(delta_time);
+        for action in actions {
+            match action {
+                Action::MoveLeft => {
+                    self.move_active_piece(Position::new(-1, 0));
                 }
-                Key::Char('z') => self.rotate_active_piece(Direction::CCW),
-                Key::Char('x') => self.rotate_active_piece(Direction::CW),
-                _ => false,
+                Action::MoveRight => {
+                    self.move_active_piece(Position::new(1, 0));
+                }
+                Action::SoftDropStarted => {
+                    self.drop_timer *= self.lines_per_second as f64 / 50f64;
+                    self.lines_per_second = 50;
+                }
+                Action::SoftDropStopped => {
+                    self.drop_timer *= self.lines_per_second as f64 / 1f64;
+                    self.lines_per_second = 1;
+                }
+                Action::HardDrop => self.hard_drop_active_piece(),
+                Action::RotateLeft => {
+                    self.rotate_active_piece(Direction::CCW);
+                }
+                Action::RotateRight => {
+                    self.rotate_active_piece(Direction::CW);
+                }
+                _ => (),
             };
         }
 

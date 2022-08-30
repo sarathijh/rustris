@@ -1,4 +1,7 @@
-use tetris::{game::tetris, piece::PieceType, queue::Queue, random::RandomBag, srs::SrsPieceSet};
+use tetris::{
+    game::tetris, input::InputActions, piece::PieceType, queue::Queue, random::RandomBag,
+    srs::SrsPieceSet,
+};
 
 mod tetris;
 
@@ -17,5 +20,6 @@ fn main() {
                 PieceType::S,
             ]),
         ),
+        InputActions::new(0.18333333333, 0.03333333333),
     )
 }

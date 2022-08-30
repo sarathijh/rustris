@@ -59,7 +59,6 @@ impl Rotation {
 
 pub trait PieceSet {
     fn units(&self, piece_type: &PieceType, rotation: &Rotation) -> [Position; 4];
-
     fn rotate_piece(&self, board: &Board, piece: &Piece, direction: Direction) -> Option<Piece>;
 }
 

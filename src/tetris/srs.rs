@@ -79,6 +79,7 @@ fn units_i(rotation: &Rotation) -> [Position; 4] {
         ],
     }
 }
+
 fn units_t(rotation: &Rotation) -> [Position; 4] {
     match rotation {
         Rotation::Up => [
@@ -107,6 +108,7 @@ fn units_t(rotation: &Rotation) -> [Position; 4] {
         ],
     }
 }
+
 fn units_o(rotation: &Rotation) -> [Position; 4] {
     match rotation {
         Rotation::Up => [
@@ -135,6 +137,7 @@ fn units_o(rotation: &Rotation) -> [Position; 4] {
         ],
     }
 }
+
 fn units_j(rotation: &Rotation) -> [Position; 4] {
     match rotation {
         Rotation::Up => [
@@ -163,6 +166,7 @@ fn units_j(rotation: &Rotation) -> [Position; 4] {
         ],
     }
 }
+
 fn units_l(rotation: &Rotation) -> [Position; 4] {
     match rotation {
         Rotation::Up => [
@@ -191,6 +195,7 @@ fn units_l(rotation: &Rotation) -> [Position; 4] {
         ],
     }
 }
+
 fn units_z(rotation: &Rotation) -> [Position; 4] {
     match rotation {
         Rotation::Up => [
@@ -219,6 +224,7 @@ fn units_z(rotation: &Rotation) -> [Position; 4] {
         ],
     }
 }
+
 fn units_s(rotation: &Rotation) -> [Position; 4] {
     match rotation {
         Rotation::Up => [

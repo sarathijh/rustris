@@ -1,6 +1,6 @@
 use tetris::{
     game::tetris, input::DasInputActions, piece::PieceType, queue::Queue, random::RandomBag,
-    srs::SrsPieceSet,
+    srs::SrsPieceSet, termion::TermionRenderer,
 };
 
 mod tetris;
@@ -10,5 +10,6 @@ fn main() {
         SrsPieceSet::new(),
         Queue::new(5, RandomBag::new(PieceType::all())),
         DasInputActions::new(0.18333333333, 0.03333333333),
+        TermionRenderer::new(),
     )
 }

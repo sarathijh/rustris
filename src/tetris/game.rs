@@ -1,13 +1,4 @@
-use std::io::{stdout, Stdout};
-
 use game_loop::game_loop;
-use ndarray::Array2;
-use std::io::Write;
-use termion::{
-    clear::All,
-    cursor::{Goto, Hide},
-    raw::{IntoRawMode, RawTerminal},
-};
 
 use super::{
     board::Board,
@@ -16,24 +7,21 @@ use super::{
     position::Position,
     queue::Queue,
     random::Random,
+    renderer::{RenderState, Renderer},
 };
 
-const BOARD_WIDTH: usize = 10;
-const BOARD_VISIBLE_HEIGHT: usize = 20;
-
-#[derive(Clone, Copy)]
-enum FillType {
-    Empty,
-    Unit,
-    Ghost,
-}
-
-pub fn tetris<TPieceSet: PieceSet, TRandom: Random<PieceType>, TInputActions: InputActions>(
+pub fn tetris<
+    TPieceSet: PieceSet,
+    TRandom: Random<PieceType>,
+    TInputActions: InputActions,
+    TRenderer: Renderer<TPieceSet>,
+>(
     piece_set: TPieceSet,
     queue: Queue<PieceType, TRandom>,
     input_actions: TInputActions,
+    renderer: TRenderer,
 ) {
-    let mut game = TetrisGame::new(piece_set, queue, input_actions);
+    let mut game = TetrisGame::new(piece_set, queue, input_actions, renderer);
     game.start();
 
     game_loop(
@@ -45,7 +33,12 @@ pub fn tetris<TPieceSet: PieceSet, TRandom: Random<PieceType>, TInputActions: In
     );
 }
 
-struct TetrisGame<TPieceSet: PieceSet, TRandom: Random<PieceType>, TInputActions> {
+struct TetrisGame<
+    TPieceSet: PieceSet,
+    TRandom: Random<PieceType>,
+    TInputActions,
+    TRenderer: Renderer<TPieceSet>,
+> {
     board: Board,
     piece_set: TPieceSet,
     active_piece: Option<Piece>,
@@ -53,20 +46,23 @@ struct TetrisGame<TPieceSet: PieceSet, TRandom: Random<PieceType>, TInputActions
     input_actions: TInputActions,
     hold_piece_type: Option<PieceType>,
     can_hold: bool,
-
-    stdout: RawTerminal<Stdout>,
-
     drop_timer: f64,
     lines_per_second: i32,
+    renderer: TRenderer,
 }
 
-impl<TPieceSet: PieceSet, TRandom: Random<PieceType>, TInputActions: InputActions>
-    TetrisGame<TPieceSet, TRandom, TInputActions>
+impl<
+        TPieceSet: PieceSet,
+        TRandom: Random<PieceType>,
+        TInputActions: InputActions,
+        TRenderer: Renderer<TPieceSet>,
+    > TetrisGame<TPieceSet, TRandom, TInputActions, TRenderer>
 {
     fn new(
         piece_set: TPieceSet,
         queue: Queue<PieceType, TRandom>,
         input_actions: TInputActions,
+        renderer: TRenderer,
     ) -> Self {
         TetrisGame {
             board: Board::new(),
@@ -76,9 +72,9 @@ impl<TPieceSet: PieceSet, TRandom: Random<PieceType>, TInputActions: InputAction
             input_actions,
             hold_piece_type: None,
             can_hold: true,
-            stdout: stdout().into_raw_mode().unwrap(),
             drop_timer: 0f64,
             lines_per_second: 1,
+            renderer,
         }
     }
 
@@ -95,9 +91,7 @@ impl<TPieceSet: PieceSet, TRandom: Random<PieceType>, TInputActions: InputAction
     }
 
     fn start(&mut self) {
-        write!(self.stdout, "{}", Hide).unwrap();
-        write!(self.stdout, "{}{}", Goto(1, 1), All).unwrap();
-        self.stdout.flush().unwrap();
+        self.renderer.init();
         self.spawn_piece(None);
     }
 
@@ -216,108 +210,28 @@ impl<TPieceSet: PieceSet, TRandom: Random<PieceType>, TInputActions: InputAction
     }
 
     fn render(&mut self) {
-        let mut composite_board = Array2::<FillType>::from_elem((20, 20), FillType::Empty);
-        for row in 0..BOARD_VISIBLE_HEIGHT {
-            for col in 0..BOARD_WIDTH {
-                let filled = self.board.rows[(BOARD_VISIBLE_HEIGHT - 1) - row][col];
-                composite_board[[row, col + 5]] = if filled {
-                    FillType::Unit
-                } else {
-                    FillType::Empty
-                }
-            }
-        }
+        let ghost_piece_position = if let Some(active_piece) = self.active_piece {
+            Some(
+                self.board.piece_cast(
+                    self.piece_set
+                        .units(&active_piece.piece_type, &active_piece.rotation),
+                    &active_piece.position,
+                    &Position::new(0, -1),
+                ),
+            )
+        } else {
+            None
+        };
 
-        if let Some(active_piece) = self.active_piece {
-            let ghost_position = self.board.piece_cast(
-                self.piece_set
-                    .units(&active_piece.piece_type, &active_piece.rotation),
-                &active_piece.position,
-                &Position::new(0, -1),
-            );
+        let render_state = RenderState::new(
+            self.board.rows.to_vec(),
+            &self.piece_set,
+            self.active_piece,
+            ghost_piece_position,
+            self.hold_piece_type,
+            self.queue.next_items().to_vec(),
+        );
 
-            if ghost_position != active_piece.position {
-                self.render_piece(
-                    active_piece.piece_type,
-                    active_piece.rotation,
-                    ghost_position + Position::new(5, 0),
-                    FillType::Ghost,
-                    &mut composite_board,
-                );
-            }
-
-            if let Some(hold_piece_type) = self.hold_piece_type {
-                self.render_piece(
-                    hold_piece_type,
-                    Rotation::Up,
-                    Position::new(1, 16),
-                    FillType::Unit,
-                    &mut composite_board,
-                );
-            }
-
-            let next_pieces = self.queue.next_items().to_vec();
-            for i in 0..next_pieces.len() {
-                let next_piece_type = *next_pieces.get(i).unwrap();
-                self.render_piece(
-                    next_piece_type,
-                    Rotation::Up,
-                    Position::new(17, (16 - 3 * i) as i32),
-                    FillType::Unit,
-                    &mut composite_board,
-                );
-            }
-
-            self.render_piece(
-                active_piece.piece_type,
-                active_piece.rotation,
-                active_piece.position + Position::new(5, 0),
-                FillType::Unit,
-                &mut composite_board,
-            );
-        }
-
-        let mut render = String::new();
-        for row in 0..20 {
-            for col in 0..20 {
-                match composite_board[[row, col]] {
-                    FillType::Unit => render.push_str("[]"),
-                    FillType::Empty => {
-                        if (5..15).contains(&col) {
-                            render.push_str("..")
-                        } else {
-                            render.push_str("  ")
-                        }
-                    }
-                    FillType::Ghost => render.push_str("=="),
-                }
-            }
-            render.push_str("\r\n");
-        }
-        render.replace_range(2..6, "HOLD");
-        render.replace_range(34..38, "NEXT");
-
-        write!(self.stdout, "{}{}", Goto(1, 1), render).unwrap();
-        self.stdout.flush().unwrap();
-    }
-
-    fn render_piece(
-        &mut self,
-        piece_type: PieceType,
-        rotation: Rotation,
-        position: Position,
-        fill_type: FillType,
-        composite_board: &mut Array2<FillType>,
-    ) {
-        let units = self.piece_set.units(&piece_type, &rotation);
-        for unit in units {
-            let x = position.x + unit.x;
-            let y = (BOARD_VISIBLE_HEIGHT - 1) as i32 - (position.y + unit.y);
-            if let [height, width] = composite_board.shape() {
-                if (0..(*width as i32)).contains(&x) && (0..(*height as i32)).contains(&y) {
-                    composite_board[[y as usize, x as usize]] = fill_type;
-                }
-            }
-        }
+        self.renderer.render(render_state);
     }
 }

@@ -5,4 +5,6 @@ pub mod piece;
 pub mod position;
 pub mod queue;
 pub mod random;
+pub mod renderer;
 pub mod srs;
+pub mod termion;

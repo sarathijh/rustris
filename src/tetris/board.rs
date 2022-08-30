@@ -22,6 +22,21 @@ impl Board {
             let position = unit + *offset;
             self.rows[position.y as usize][position.x as usize] = true;
         }
+        self.clear_lines();
+    }
+
+    fn clear_lines(&mut self) {
+        for row in (0..40).rev() {
+            if self.rows[row].iter().all(|it| *it) {
+                for i in row..39 {
+                    let next_row = self.rows[i + 1];
+                    self.rows[i].copy_from_slice(&next_row);
+                }
+                self.rows[39] = [
+                    false, false, false, false, false, false, false, false, false, false,
+                ];
+            }
+        }
     }
 
     pub fn piece_cast(

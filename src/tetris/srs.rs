@@ -47,28 +47,28 @@ impl PieceSet for SrsPieceSet {
 fn units_i(rotation: &Rotation) -> [Position; 4] {
     match rotation {
         Rotation::Up => [
-            Position::new(-1, 1),
+            Position::new(-1, 0),
             Position::new(0, 0),
             Position::new(1, 0),
             Position::new(2, 0),
         ],
         Rotation::Right => [
-            Position::new(-1, 1),
+            Position::new(0, -2),
+            Position::new(0, -1),
             Position::new(0, 0),
-            Position::new(1, 0),
-            Position::new(2, 0),
+            Position::new(0, 1),
         ],
         Rotation::Down => [
-            Position::new(-1, 1),
+            Position::new(-2, 0),
+            Position::new(-1, 0),
             Position::new(0, 0),
             Position::new(1, 0),
-            Position::new(2, 0),
         ],
         Rotation::Left => [
-            Position::new(-1, 1),
+            Position::new(0, -1),
             Position::new(0, 0),
-            Position::new(1, 0),
-            Position::new(2, 0),
+            Position::new(0, 1),
+            Position::new(0, 2),
         ],
     }
 }
@@ -103,181 +103,213 @@ fn units_t(rotation: &Rotation) -> [Position; 4] {
 fn units_o(rotation: &Rotation) -> [Position; 4] {
     match rotation {
         Rotation::Up => [
-            Position::new(-1, 1),
             Position::new(0, 0),
             Position::new(1, 0),
-            Position::new(2, 0),
+            Position::new(0, 1),
+            Position::new(1, 1),
         ],
         Rotation::Right => [
-            Position::new(-1, 1),
             Position::new(0, 0),
             Position::new(1, 0),
-            Position::new(2, 0),
+            Position::new(0, 1),
+            Position::new(1, 1),
         ],
         Rotation::Down => [
-            Position::new(-1, 1),
             Position::new(0, 0),
             Position::new(1, 0),
-            Position::new(2, 0),
+            Position::new(0, 1),
+            Position::new(1, 1),
         ],
         Rotation::Left => [
-            Position::new(-1, 1),
             Position::new(0, 0),
             Position::new(1, 0),
-            Position::new(2, 0),
+            Position::new(0, 1),
+            Position::new(1, 1),
         ],
     }
 }
 fn units_j(rotation: &Rotation) -> [Position; 4] {
     match rotation {
         Rotation::Up => [
-            Position::new(-1, 1),
             Position::new(0, 0),
+            Position::new(-1, 0),
             Position::new(1, 0),
-            Position::new(2, 0),
+            Position::new(-1, 1),
         ],
         Rotation::Right => [
-            Position::new(-1, 1),
+            Position::new(0, -1),
             Position::new(0, 0),
-            Position::new(1, 0),
-            Position::new(2, 0),
+            Position::new(0, 1),
+            Position::new(1, 1),
         ],
         Rotation::Down => [
-            Position::new(-1, 1),
             Position::new(0, 0),
+            Position::new(-1, 0),
             Position::new(1, 0),
-            Position::new(2, 0),
+            Position::new(1, -1),
         ],
         Rotation::Left => [
-            Position::new(-1, 1),
+            Position::new(0, -1),
             Position::new(0, 0),
-            Position::new(1, 0),
-            Position::new(2, 0),
+            Position::new(0, 1),
+            Position::new(-1, -1),
         ],
     }
 }
 fn units_l(rotation: &Rotation) -> [Position; 4] {
     match rotation {
         Rotation::Up => [
-            Position::new(-1, 1),
             Position::new(0, 0),
+            Position::new(-1, 0),
             Position::new(1, 0),
-            Position::new(2, 0),
+            Position::new(1, 1),
         ],
         Rotation::Right => [
-            Position::new(-1, 1),
+            Position::new(0, -1),
             Position::new(0, 0),
-            Position::new(1, 0),
-            Position::new(2, 0),
+            Position::new(0, 1),
+            Position::new(1, -1),
         ],
         Rotation::Down => [
-            Position::new(-1, 1),
             Position::new(0, 0),
+            Position::new(-1, 0),
             Position::new(1, 0),
-            Position::new(2, 0),
+            Position::new(-1, -1),
         ],
         Rotation::Left => [
-            Position::new(-1, 1),
+            Position::new(0, -1),
             Position::new(0, 0),
-            Position::new(1, 0),
-            Position::new(2, 0),
+            Position::new(0, 1),
+            Position::new(-1, 1),
         ],
     }
 }
 fn units_z(rotation: &Rotation) -> [Position; 4] {
     match rotation {
         Rotation::Up => [
-            Position::new(-1, 1),
             Position::new(0, 0),
             Position::new(1, 0),
-            Position::new(2, 0),
+            Position::new(-1, 1),
+            Position::new(0, 1),
         ],
         Rotation::Right => [
-            Position::new(-1, 1),
             Position::new(0, 0),
+            Position::new(0, -1),
             Position::new(1, 0),
-            Position::new(2, 0),
+            Position::new(1, 1),
         ],
         Rotation::Down => [
-            Position::new(-1, 1),
             Position::new(0, 0),
-            Position::new(1, 0),
-            Position::new(2, 0),
+            Position::new(-1, 0),
+            Position::new(1, -1),
+            Position::new(0, -1),
         ],
         Rotation::Left => [
-            Position::new(-1, 1),
             Position::new(0, 0),
-            Position::new(1, 0),
-            Position::new(2, 0),
+            Position::new(0, 1),
+            Position::new(-1, 0),
+            Position::new(-1, -1),
         ],
     }
 }
 fn units_s(rotation: &Rotation) -> [Position; 4] {
     match rotation {
         Rotation::Up => [
-            Position::new(-1, 1),
             Position::new(0, 0),
-            Position::new(1, 0),
-            Position::new(2, 0),
+            Position::new(-1, 0),
+            Position::new(0, 1),
+            Position::new(1, 1),
         ],
         Rotation::Right => [
-            Position::new(-1, 1),
             Position::new(0, 0),
+            Position::new(0, 1),
             Position::new(1, 0),
-            Position::new(2, 0),
+            Position::new(1, -1),
         ],
         Rotation::Down => [
-            Position::new(-1, 1),
             Position::new(0, 0),
             Position::new(1, 0),
-            Position::new(2, 0),
+            Position::new(-1, -1),
+            Position::new(0, -1),
         ],
         Rotation::Left => [
-            Position::new(-1, 1),
             Position::new(0, 0),
-            Position::new(1, 0),
-            Position::new(2, 0),
+            Position::new(0, -1),
+            Position::new(-1, 0),
+            Position::new(-1, 1),
         ],
     }
 }
 
 fn kick_offsets(piece_type: &PieceType, rotation: &Rotation) -> Vec<Position> {
     match piece_type {
-        PieceType::I => todo!(),
-        PieceType::T => match rotation {
+        PieceType::I => match rotation {
             Rotation::Up => vec![
                 Position::new(0, 0),
-                Position::new(0, 0),
-                Position::new(0, 0),
-                Position::new(0, 0),
-                Position::new(0, 0),
+                Position::new(-1, 0),
+                Position::new(2, 0),
+                Position::new(-1, 0),
+                Position::new(2, 0),
             ],
             Rotation::Right => vec![
+                Position::new(-1, 0),
                 Position::new(0, 0),
-                Position::new(1, 0),
-                Position::new(1, -1),
-                Position::new(0, 2),
-                Position::new(1, 2),
+                Position::new(0, 0),
+                Position::new(0, 1),
+                Position::new(0, -2),
             ],
             Rotation::Down => vec![
-                Position::new(0, 0),
-                Position::new(0, 0),
-                Position::new(0, 0),
-                Position::new(0, 0),
-                Position::new(0, 0),
+                Position::new(-1, 1),
+                Position::new(1, 1),
+                Position::new(-2, 1),
+                Position::new(1, 0),
+                Position::new(-2, 0),
             ],
             Rotation::Left => vec![
-                Position::new(0, 0),
-                Position::new(-1, 0),
-                Position::new(-1, -1),
+                Position::new(0, 1),
+                Position::new(0, 1),
+                Position::new(0, 1),
+                Position::new(0, -1),
                 Position::new(0, 2),
-                Position::new(-1, 2),
             ],
         },
-        PieceType::O => todo!(),
-        PieceType::J => todo!(),
-        PieceType::L => todo!(),
-        PieceType::Z => todo!(),
-        PieceType::S => todo!(),
+        PieceType::T | PieceType::Z | PieceType::S | PieceType::L | PieceType::J => {
+            match rotation {
+                Rotation::Up => vec![
+                    Position::new(0, 0),
+                    Position::new(0, 0),
+                    Position::new(0, 0),
+                    Position::new(0, 0),
+                    Position::new(0, 0),
+                ],
+                Rotation::Right => vec![
+                    Position::new(0, 0),
+                    Position::new(1, 0),
+                    Position::new(1, -1),
+                    Position::new(0, 2),
+                    Position::new(1, 2),
+                ],
+                Rotation::Down => vec![
+                    Position::new(0, 0),
+                    Position::new(0, 0),
+                    Position::new(0, 0),
+                    Position::new(0, 0),
+                    Position::new(0, 0),
+                ],
+                Rotation::Left => vec![
+                    Position::new(0, 0),
+                    Position::new(-1, 0),
+                    Position::new(-1, -1),
+                    Position::new(0, 2),
+                    Position::new(-1, 2),
+                ],
+            }
+        }
+        PieceType::O => match rotation {
+            Rotation::Up => vec![Position::new(0, 0)],
+            Rotation::Right => vec![Position::new(0, 0)],
+            Rotation::Down => vec![Position::new(0, 0)],
+            Rotation::Left => vec![Position::new(0, 0)],
+        },
     }
 }

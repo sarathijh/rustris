@@ -15,6 +15,7 @@ use super::{
     board::Board,
     piece::{Direction, Piece, PieceSet, PieceType, Rotation},
     position::Position,
+    queue::Queue,
     random::Random,
 };
 
@@ -23,9 +24,9 @@ const BOARD_VISIBLE_HEIGHT: usize = 20;
 
 pub fn tetris<TPieceSet: PieceSet, TRandom: Random<PieceType>>(
     piece_set: TPieceSet,
-    random: TRandom,
+    queue: Queue<PieceType, TRandom>,
 ) {
-    let mut game = TetrisGame::new(piece_set, random);
+    let mut game = TetrisGame::new(piece_set, queue);
     game.start();
 
     game_loop(
@@ -41,7 +42,7 @@ struct TetrisGame<TPieceSet: PieceSet, TRandom: Random<PieceType>> {
     board: Board,
     piece_set: TPieceSet,
     active_piece: Option<Piece>,
-    random: TRandom,
+    queue: Queue<PieceType, TRandom>,
 
     stdout: RawTerminal<Stdout>,
     stdin: Keys<AsyncReader>,
@@ -51,12 +52,12 @@ struct TetrisGame<TPieceSet: PieceSet, TRandom: Random<PieceType>> {
 }
 
 impl<TPieceSet: PieceSet, TRandom: Random<PieceType>> TetrisGame<TPieceSet, TRandom> {
-    fn new(piece_set: TPieceSet, random: TRandom) -> Self {
+    fn new(piece_set: TPieceSet, queue: Queue<PieceType, TRandom>) -> Self {
         TetrisGame {
             board: Board::new(),
             piece_set,
             active_piece: None,
-            random,
+            queue,
             stdout: stdout().into_raw_mode().unwrap(),
             stdin: termion::async_stdin().keys(),
             drop_timer: 0f64,
@@ -66,7 +67,7 @@ impl<TPieceSet: PieceSet, TRandom: Random<PieceType>> TetrisGame<TPieceSet, TRan
 
     fn spawn_piece(&mut self) {
         self.active_piece = Some(Piece {
-            piece_type: PieceType::T,
+            piece_type: self.queue.next(),
             rotation: Rotation::Up,
             position: Position::new(4, 19),
         });
@@ -85,6 +86,7 @@ impl<TPieceSet: PieceSet, TRandom: Random<PieceType>> TetrisGame<TPieceSet, TRan
             let _ = match key {
                 Key::Left => self.move_active_piece(Position::new(-1, 0)),
                 Key::Right => self.move_active_piece(Position::new(1, 0)),
+                Key::Down => self.move_active_piece(Position::new(0, -1)),
                 Key::Up => {
                     self.hard_drop_active_piece();
                     false

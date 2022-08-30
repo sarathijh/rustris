@@ -6,10 +6,7 @@ use std::io::Write;
 use termion::{
     clear::All,
     cursor::{Goto, Hide},
-    event::Key,
-    input::{Keys, TermRead},
     raw::{IntoRawMode, RawTerminal},
-    AsyncReader,
 };
 
 use super::{
@@ -58,7 +55,6 @@ struct TetrisGame<TPieceSet: PieceSet, TRandom: Random<PieceType>, TInputActions
     can_hold: bool,
 
     stdout: RawTerminal<Stdout>,
-    stdin: Keys<AsyncReader>,
 
     drop_timer: f64,
     lines_per_second: i32,
@@ -81,7 +77,6 @@ impl<TPieceSet: PieceSet, TRandom: Random<PieceType>, TInputActions: InputAction
             hold_piece_type: None,
             can_hold: true,
             stdout: stdout().into_raw_mode().unwrap(),
-            stdin: termion::async_stdin().keys(),
             drop_timer: 0f64,
             lines_per_second: 1,
         }
@@ -144,7 +139,6 @@ impl<TPieceSet: PieceSet, TRandom: Random<PieceType>, TInputActions: InputAction
                         }
                     }
                 }
-                _ => (),
             };
         }
 

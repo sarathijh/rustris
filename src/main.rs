@@ -1,5 +1,5 @@
 use tetris::{
-    game::tetris, input::InputActions, piece::PieceType, queue::Queue, random::RandomBag,
+    game::tetris, input::DasInputActions, piece::PieceType, queue::Queue, random::RandomBag,
     srs::SrsPieceSet,
 };
 
@@ -7,19 +7,8 @@ mod tetris;
 
 fn main() {
     tetris(
-        SrsPieceSet {},
-        Queue::new(
-            5,
-            RandomBag::new(vec![
-                PieceType::I,
-                PieceType::T,
-                PieceType::O,
-                PieceType::J,
-                PieceType::L,
-                PieceType::Z,
-                PieceType::S,
-            ]),
-        ),
-        InputActions::new(0.18333333333, 0.03333333333),
+        SrsPieceSet::new(),
+        Queue::new(5, RandomBag::new(PieceType::all())),
+        DasInputActions::new(0.18333333333, 0.03333333333),
     )
 }

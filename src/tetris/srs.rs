@@ -5,6 +5,13 @@ use super::{
 };
 
 pub struct SrsPieceSet {}
+
+impl SrsPieceSet {
+    pub fn new() -> Self {
+        Self {}
+    }
+}
+
 impl PieceSet for SrsPieceSet {
     fn units(&self, piece_type: &PieceType, rotation: &Rotation) -> [Position; 4] {
         match piece_type {

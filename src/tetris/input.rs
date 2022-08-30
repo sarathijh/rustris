@@ -87,7 +87,11 @@ pub enum Action {
     Hold,
 }
 
-pub struct InputActions {
+pub trait InputActions {
+    fn actions(&mut self, delta_time: f64) -> Vec<Action>;
+}
+
+pub struct DasInputActions {
     input_source: InputSource,
     delayed_auto_shift: f64,
     auto_repeat_rate: f64,
@@ -96,7 +100,7 @@ pub struct InputActions {
     holding_right: bool,
 }
 
-impl InputActions {
+impl DasInputActions {
     pub fn new(delayed_auto_shift: f64, auto_repeat_rate: f64) -> Self {
         Self {
             input_source: InputSource::new(),
@@ -108,7 +112,24 @@ impl InputActions {
         }
     }
 
-    pub fn actions(&mut self, delta_time: f64) -> Vec<Action> {
+    fn handle_auto_shift_timer(&mut self, delta_time: f64) -> i32 {
+        if self.auto_shift_timer > f64::EPSILON {
+            self.auto_shift_timer -= delta_time;
+        }
+
+        let mut count = 0;
+
+        while self.auto_shift_timer <= -f64::EPSILON {
+            count += 1;
+            self.auto_shift_timer += self.auto_repeat_rate;
+        }
+
+        count
+    }
+}
+
+impl InputActions for DasInputActions {
+    fn actions(&mut self, delta_time: f64) -> Vec<Action> {
         let inputs = self.input_source.inputs();
         let mut actions = Vec::<Action>::new();
         if inputs.contains(&Input::LeftPress) {
@@ -160,20 +181,5 @@ impl InputActions {
             }
         }
         actions
-    }
-
-    fn handle_auto_shift_timer(&mut self, delta_time: f64) -> i32 {
-        if self.auto_shift_timer > f64::EPSILON {
-            self.auto_shift_timer -= delta_time;
-        }
-
-        let mut count = 0;
-
-        while self.auto_shift_timer <= -f64::EPSILON {
-            count += 1;
-            self.auto_shift_timer += self.auto_repeat_rate;
-        }
-
-        count
     }
 }

@@ -1,6 +1,6 @@
 use super::{board::Board, position::Position};
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub enum PieceType {
     I,
     T,
@@ -9,6 +9,20 @@ pub enum PieceType {
     L,
     Z,
     S,
+}
+
+impl PieceType {
+    pub fn all() -> Vec<PieceType> {
+        vec![
+            PieceType::I,
+            PieceType::T,
+            PieceType::O,
+            PieceType::J,
+            PieceType::L,
+            PieceType::Z,
+            PieceType::S,
+        ]
+    }
 }
 
 #[derive(Eq, PartialEq, Hash, Copy, Clone)]

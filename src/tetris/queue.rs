@@ -7,7 +7,7 @@ pub struct Queue<T: Clone, TRandom: Random<T>> {
 }
 
 impl<T: Clone, TRandom: Random<T>> Queue<T, TRandom> {
-    pub fn new(size: usize, mut random: TRandom) -> Self {
+    pub fn new(size: usize, random: TRandom) -> Self {
         Self {
             random,
             size,
@@ -16,13 +16,20 @@ impl<T: Clone, TRandom: Random<T>> Queue<T, TRandom> {
     }
 
     pub fn next(&mut self) -> T {
-        self.random.next()
+        self.populate_next_items();
+        let item = self.next_items.remove(0);
+        self.populate_next_items();
+        item
     }
 
     pub fn next_items(&mut self) -> &Vec<T> {
-        while self.next_items.is_empty() {
+        self.populate_next_items();
+        &self.next_items
+    }
+
+    fn populate_next_items(&mut self) {
+        while self.next_items.len() < self.size {
             self.next_items.push(self.random.next())
         }
-        &self.next_items
     }
 }

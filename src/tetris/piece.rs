@@ -1,0 +1,57 @@
+use super::{board::Board, position::Position};
+
+#[derive(Copy, Clone)]
+pub enum PieceType {
+    I,
+    T,
+    O,
+    J,
+    L,
+    Z,
+    S,
+}
+
+#[derive(Eq, PartialEq, Hash, Copy, Clone)]
+pub enum Rotation {
+    Up,
+    Right,
+    Down,
+    Left,
+}
+
+pub enum Direction {
+    CW,
+    CCW,
+}
+
+impl Rotation {
+    pub fn rotate(&self, direction: Direction) -> Rotation {
+        match direction {
+            Direction::CW => match self {
+                Rotation::Up => Rotation::Right,
+                Rotation::Right => Rotation::Down,
+                Rotation::Down => Rotation::Left,
+                Rotation::Left => Rotation::Up,
+            },
+            Direction::CCW => match self {
+                Rotation::Up => Rotation::Left,
+                Rotation::Right => Rotation::Up,
+                Rotation::Down => Rotation::Right,
+                Rotation::Left => Rotation::Down,
+            },
+        }
+    }
+}
+
+pub trait PieceSet {
+    fn units(&self, piece_type: &PieceType, rotation: &Rotation) -> [Position; 4];
+
+    fn rotate_piece(&self, board: &Board, piece: &Piece, direction: Direction) -> Option<Piece>;
+}
+
+#[derive(Clone, Copy)]
+pub struct Piece {
+    pub piece_type: PieceType,
+    pub rotation: Rotation,
+    pub position: Position,
+}

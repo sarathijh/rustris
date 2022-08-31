@@ -11,7 +11,7 @@ use tetris_termion::TermionRenderer;
 fn main() {
     // Create a new tetris game simulation using:
     // - Super Rotation System (SRS)
-    // - A next queue showing 5 zpieces
+    // - A next queue showing 5 pieces
     // - A random bag generator
     // - Delayed Auto Shift (DAS) input
     // - An input source implementation that uses the keyboard_query crate

@@ -1,22 +1,22 @@
-extern crate tetris_core;
+extern crate rustris_core;
 
 use game_loop::game_loop;
-use tetris_core::{
-    game::TetrisGame, input::DasInputActions, piece::PieceType, queue::Queue, random::RandomBag,
+use rustris_core::{
+    game::Rustris, input::DasInputActions, piece::PieceType, queue::Queue, random::RandomBag,
 };
-use tetris_keyboard_query::KeyboardQueryInputSource;
-use tetris_srs::SrsPieceSet;
-use tetris_termion::TermionRenderer;
+use rustris_keyboard_query::KeyboardQueryInputSource;
+use rustris_srs::SrsPieceSet;
+use rustris_termion::TermionRenderer;
 
 fn main() {
-    // Create a new tetris game simulation using:
+    // Create a new rustris game simulation using:
     // - Super Rotation System (SRS)
     // - A next queue showing 5 pieces
     // - A random bag generator
     // - Delayed Auto Shift (DAS) input
     // - An input source implementation that uses the keyboard_query crate
     // - A rendering implementation that uses the termion crate
-    let mut game = TetrisGame::new(
+    let mut game = Rustris::new(
         SrsPieceSet::new(),
         Queue::new(5, RandomBag::new(PieceType::all())),
         DasInputActions::new(

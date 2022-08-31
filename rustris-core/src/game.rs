@@ -85,7 +85,7 @@ pub enum Message {
     AllClear,
 }
 
-pub struct TetrisGame<
+pub struct Rustris<
     TPieceSet: PieceSet,
     TRandom: Random<PieceType>,
     TInputActions,
@@ -109,7 +109,7 @@ impl<
         TRandom: Random<PieceType>,
         TInputActions: InputActions,
         TRenderer: Renderer<TPieceSet>,
-    > TetrisGame<TPieceSet, TRandom, TInputActions, TRenderer>
+    > Rustris<TPieceSet, TRandom, TInputActions, TRenderer>
 {
     pub fn new(
         piece_set: TPieceSet,
@@ -117,7 +117,7 @@ impl<
         input_actions: TInputActions,
         renderer: TRenderer,
     ) -> Self {
-        TetrisGame {
+        Rustris {
             board: Board::new(),
             piece_set,
             active_piece: None,

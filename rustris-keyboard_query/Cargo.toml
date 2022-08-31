@@ -1,8 +1,8 @@
 [package]
-name = "tetris-keyboard_query"
+name = "rustris-keyboard_query"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-tetris-core = { path="../tetris-core" }
+rustris-core = { path="../rustris-core" }
 keyboard_query = "0.1.0"

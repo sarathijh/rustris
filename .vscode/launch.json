@@ -7,15 +7,15 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug executable 'tetris'",
+            "name": "Debug executable 'rustris'",
             "cargo": {
                 "args": [
                     "build",
-                    "--bin=tetris",
-                    "--package=tetris"
+                    "--bin=rustris",
+                    "--package=rustris"
                 ],
                 "filter": {
-                    "name": "tetris",
+                    "name": "rustris",
                     "kind": "bin"
                 }
             },
@@ -25,16 +25,16 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug unit tests in executable 'tetris'",
+            "name": "Debug unit tests in executable 'rustris'",
             "cargo": {
                 "args": [
                     "test",
                     "--no-run",
-                    "--bin=tetris",
-                    "--package=tetris"
+                    "--bin=rustris",
+                    "--package=rustris"
                 ],
                 "filter": {
-                    "name": "tetris",
+                    "name": "rustris",
                     "kind": "bin"
                 }
             },

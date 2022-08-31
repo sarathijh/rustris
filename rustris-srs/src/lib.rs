@@ -1,4 +1,4 @@
-use tetris_core::{
+use rustris_core::{
     board::Board,
     piece::{Direction, Piece, PieceSet, PieceType, Rotation},
     position::Position,

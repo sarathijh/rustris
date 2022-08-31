@@ -321,6 +321,49 @@ dependencies = [
 ]
 
 [[package]]
+name = "rustris"
+version = "0.1.0"
+dependencies = [
+ "game-loop",
+ "rustris-core",
+ "rustris-keyboard_query",
+ "rustris-srs",
+ "rustris-termion",
+]
+
+[[package]]
+name = "rustris-core"
+version = "0.1.0"
+dependencies = [
+ "ndarray",
+ "rand",
+]
+
+[[package]]
+name = "rustris-keyboard_query"
+version = "0.1.0"
+dependencies = [
+ "keyboard_query",
+ "rustris-core",
+]
+
+[[package]]
+name = "rustris-srs"
+version = "0.1.0"
+dependencies = [
+ "rustris-core",
+]
+
+[[package]]
+name = "rustris-termion"
+version = "0.1.0"
+dependencies = [
+ "ndarray",
+ "rustris-core",
+ "termion",
+]
+
+[[package]]
 name = "syn"
 version = "1.0.99"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -341,49 +384,6 @@ dependencies = [
  "numtoa",
  "redox_syscall",
  "redox_termios",
-]
-
-[[package]]
-name = "tetris"
-version = "0.1.0"
-dependencies = [
- "game-loop",
- "tetris-core",
- "tetris-keyboard_query",
- "tetris-srs",
- "tetris-termion",
-]
-
-[[package]]
-name = "tetris-core"
-version = "0.1.0"
-dependencies = [
- "ndarray",
- "rand",
-]
-
-[[package]]
-name = "tetris-keyboard_query"
-version = "0.1.0"
-dependencies = [
- "keyboard_query",
- "tetris-core",
-]
-
-[[package]]
-name = "tetris-srs"
-version = "0.1.0"
-dependencies = [
- "tetris-core",
-]
-
-[[package]]
-name = "tetris-termion"
-version = "0.1.0"
-dependencies = [
- "ndarray",
- "termion",
- "tetris-core",
 ]
 
 [[package]]

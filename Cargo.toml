@@ -1,11 +1,11 @@
 [package]
-name = "tetris"
+name = "rustris"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
 game-loop = "0.9.1"
-tetris-core = { path = "tetris-core", version = "0.1.0" }
-tetris-srs = { path = "tetris-srs", version = "0.1.0" }
-tetris-termion = { path = "tetris-termion", version = "0.1.0" }
-tetris-keyboard_query = { path = "tetris-keyboard_query", version = "0.1.0" }
+rustris-core = { path = "rustris-core", version = "0.1.0" }
+rustris-srs = { path = "rustris-srs", version = "0.1.0" }
+rustris-termion = { path = "rustris-termion", version = "0.1.0" }
+rustris-keyboard_query = { path = "rustris-keyboard_query", version = "0.1.0" }

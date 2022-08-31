@@ -1,9 +1,9 @@
 [package]
-name = "tetris-termion"
+name = "rustris-termion"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-tetris-core = { path="../tetris-core" }
+rustris-core = { path="../rustris-core" }
 termion = "1.5.5"
 ndarray = "0.15.6"

@@ -8,12 +8,12 @@ use termion::{
     raw::{IntoRawMode, RawTerminal},
 };
 
-use tetris_core::{
+use rustris_core::{
     game::Message,
     piece::{PieceSet, PieceType, Rotation},
     renderer::Renderer,
 };
-use tetris_core::{position::Position, renderer::RenderState};
+use rustris_core::{position::Position, renderer::RenderState};
 
 const CELL_WIDTH: usize = 2;
 const CELL_HEIGHT: usize = 1;

@@ -1,6 +1,6 @@
 use super::{board::Board, position::Position};
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum PieceType {
     I,
     T,

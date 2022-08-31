@@ -23,19 +23,20 @@ impl Board {
     }
 
     /// Adds the piece's units permanently to the board
-    pub fn lock_piece(&mut self, units: [Position; 4], offset: &Position) {
+    pub fn lock_piece(&mut self, units: [Position; 4], offset: &Position) -> usize {
         for unit in units {
             let position = unit + *offset;
             self.rows[position.y as usize][position.x as usize] = true;
         }
 
         // Check if lines need to be cleared after the piece is locked
-        self.clear_lines();
+        self.clear_lines()
     }
 
     /// Removes all filled rows
     /// When a row is removed, all rows above it are moved down
-    fn clear_lines(&mut self) {
+    fn clear_lines(&mut self) -> usize {
+        let mut lines_cleared: usize = 0;
         for row in (0..40).rev() {
             if self.rows[row].iter().all(|it| *it) {
                 for i in row..39 {
@@ -45,8 +46,14 @@ impl Board {
                 self.rows[39] = [
                     false, false, false, false, false, false, false, false, false, false,
                 ];
+                lines_cleared += 1;
             }
         }
+        lines_cleared
+    }
+
+    pub fn is_all_clear(&self) -> bool {
+        self.rows.iter().all(|row| row.iter().all(|cell| !cell))
     }
 
     /// Determines how far a piece can move in the given direction before it is obstructed

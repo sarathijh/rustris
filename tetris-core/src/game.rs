@@ -71,6 +71,20 @@ impl GravityFeature {
     }
 }
 
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum Message {
+    Single,
+    Double,
+    Triple,
+    Quad,
+    Combo(i32),
+    Twist(PieceType),
+    TwistSingle(PieceType),
+    TwistDouble(PieceType),
+    TwistTriple(PieceType),
+    AllClear,
+}
+
 pub struct TetrisGame<
     TPieceSet: PieceSet,
     TRandom: Random<PieceType>,
@@ -87,6 +101,7 @@ pub struct TetrisGame<
     gravity_feature: GravityFeature,
     renderer: TRenderer,
     paused: bool,
+    messages: Vec<Message>,
 }
 
 impl<
@@ -113,6 +128,7 @@ impl<
             gravity_feature: GravityFeature::new(1),
             renderer,
             paused: false,
+            messages: vec![],
         }
     }
 
@@ -223,11 +239,21 @@ impl<
 
     fn lock_active_piece(&mut self) {
         if let Some(active_piece) = self.active_piece {
-            self.board.lock_piece(
+            let lines_cleared = self.board.lock_piece(
                 self.piece_set
                     .units(&active_piece.piece_type, &active_piece.rotation),
                 &active_piece.position,
             );
+            match lines_cleared {
+                1 => self.messages.push(Message::Single),
+                2 => self.messages.push(Message::Double),
+                3 => self.messages.push(Message::Triple),
+                4 => self.messages.push(Message::Quad),
+                _ => (),
+            };
+            if self.board.is_all_clear() {
+                self.messages.push(Message::AllClear);
+            }
             self.spawn_piece(None);
             self.hold_feature.reset();
         }
@@ -244,15 +270,20 @@ impl<
         };
     }
 
-    pub fn render(&mut self) {
-        self.renderer.render(RenderState::new(
-            self.board.rows.to_vec(),
-            &self.piece_set,
-            self.active_piece,
-            self.ghost_piece_position,
-            self.hold_feature.hold_piece_type,
-            self.queue.next_items().to_vec(),
-            self.paused,
-        ));
+    pub fn render(&mut self, delta_time: f64) {
+        self.renderer.render(
+            RenderState::new(
+                self.board.rows.to_vec(),
+                &self.piece_set,
+                self.active_piece,
+                self.ghost_piece_position,
+                self.hold_feature.hold_piece_type,
+                self.queue.next_items().to_vec(),
+                self.paused,
+                self.messages.to_vec(),
+            ),
+            delta_time,
+        );
+        self.messages.clear();
     }
 }

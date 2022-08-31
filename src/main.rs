@@ -37,6 +37,6 @@ fn main() {
         60,
         1.0,
         |g| g.game.update(g.fixed_time_step()),
-        |g| g.game.render(),
+        |g| g.game.render(g.fixed_time_step()),
     );
 }

@@ -9,6 +9,7 @@ use termion::{
 };
 
 use tetris_core::{
+    game::Message,
     piece::{PieceSet, PieceType, Rotation},
     renderer::Renderer,
 };
@@ -28,14 +29,33 @@ const BOTTOM_BORDER_HEIGHT: usize = 2;
 const BOARD_WIDTH: usize = 10;
 const BOARD_HEIGHT: usize = 20;
 
+#[derive(Clone, Copy)]
+struct MessageState {
+    message: Message,
+    timer: f64,
+}
+
+impl MessageState {
+    fn new(message: Message) -> Self {
+        Self {
+            message,
+            timer: 100f64,
+        }
+    }
+}
+
 pub struct TermionRenderer {
     stdout: RawTerminal<Stdout>,
+    message_states: Vec<MessageState>,
+    all_clear_timer: f64,
 }
 
 impl TermionRenderer {
     pub fn new() -> Self {
         Self {
             stdout: stdout().into_raw_mode().unwrap(),
+            message_states: vec![],
+            all_clear_timer: 0f64,
         }
     }
 
@@ -70,7 +90,15 @@ impl<TPieceSet: PieceSet> Renderer<TPieceSet> for TermionRenderer {
         self.stdout.flush().unwrap();
     }
 
-    fn render(&mut self, state: RenderState<TPieceSet>) {
+    fn render(&mut self, state: RenderState<TPieceSet>, delta_time: f64) {
+        for message in state.messages {
+            if message == Message::AllClear {
+                self.all_clear_timer = 100f64;
+            } else {
+                self.message_states.push(MessageState::new(message));
+            }
+        }
+
         let render_width = (LEFT_CONTENT_WIDTH
             + LEFT_BORDER_WIDTH
             + BOARD_WIDTH
@@ -248,6 +276,53 @@ impl<TPieceSet: PieceSet> Renderer<TPieceSet> for TermionRenderer {
         render_ir[[board_start_y, right_content_start_x + 3]] = 'E';
         render_ir[[board_start_y, right_content_start_x + 4]] = 'X';
         render_ir[[board_start_y, right_content_start_x + 5]] = 'T';
+
+        if self.all_clear_timer > 0f64 {
+            self.all_clear_timer -= delta_time;
+
+            let message_text = "ALL CLEAR".to_string();
+
+            for j in 0..message_text.len() {
+                let char = message_text.chars().nth(j).unwrap();
+                render_ir[[
+                    board_start_y + (BOARD_HEIGHT * CELL_HEIGHT) / 2,
+                    board_start_x + (BOARD_WIDTH * CELL_WIDTH) / 2 - message_text.len() / 2 + j,
+                ]] = char;
+            }
+        }
+
+        for i in 0..self.message_states.len() {
+            let message_state = self.message_states[i];
+            self.message_states[i].timer -= delta_time;
+            if message_state.timer <= 0f64 {
+                continue;
+            }
+
+            let message_text = match message_state.message {
+                Message::Single => "SINGLE".to_string(),
+                Message::Double => "DOUBLE".to_string(),
+                Message::Triple => "TRIPLE".to_string(),
+                Message::Quad => "QUAD".to_string(),
+                Message::Combo(combo) => format!("COMBO {}", combo),
+                Message::Twist(_) => "TWIST".to_string(),
+                Message::TwistSingle(_) => "TWIST SINGLE".to_string(),
+                Message::TwistDouble(_) => "TWIST DOUBLE".to_string(),
+                Message::TwistTriple(_) => "TWIST TRIPLE".to_string(),
+                Message::AllClear => continue,
+            };
+
+            for j in 0..message_text.len() {
+                let char = message_text.chars().nth(j).unwrap();
+                render_ir[[board_start_y + 7 + i * 2, 1 + j]] = char;
+            }
+        }
+
+        self.message_states = self
+            .message_states
+            .to_vec()
+            .into_iter()
+            .filter(|message_state| message_state.timer > 0f64)
+            .collect();
 
         // Create a string builder for the final render
         let mut render = String::new();

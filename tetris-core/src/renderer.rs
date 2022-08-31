@@ -1,3 +1,5 @@
+use crate::game::Message;
+
 use super::{
     piece::{Piece, PieceSet, PieceType},
     position::Position,
@@ -13,6 +15,7 @@ pub struct RenderState<'a, TPieceSet: PieceSet> {
     pub hold_piece_type: Option<PieceType>,
     pub next_piece_types: Vec<PieceType>,
     pub paused: bool,
+    pub messages: Vec<Message>,
 }
 
 impl<'a, TPieceSet: PieceSet> RenderState<'a, TPieceSet> {
@@ -24,6 +27,7 @@ impl<'a, TPieceSet: PieceSet> RenderState<'a, TPieceSet> {
         hold_piece_type: Option<PieceType>,
         next_piece_types: Vec<PieceType>,
         paused: bool,
+        messages: Vec<Message>,
     ) -> Self {
         Self {
             board_state,
@@ -33,11 +37,12 @@ impl<'a, TPieceSet: PieceSet> RenderState<'a, TPieceSet> {
             hold_piece_type,
             next_piece_types,
             paused,
+            messages,
         }
     }
 }
 
 pub trait Renderer<TPieceSet: PieceSet> {
     fn init(&mut self);
-    fn render(&mut self, state: RenderState<TPieceSet>);
+    fn render(&mut self, state: RenderState<TPieceSet>, delta_time: f64);
 }

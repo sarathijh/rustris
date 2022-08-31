@@ -38,9 +38,7 @@ impl TermionRenderer {
             stdout: stdout().into_raw_mode().unwrap(),
         }
     }
-}
 
-impl TermionRenderer {
     fn render_piece<TPieceSet: PieceSet>(
         &mut self,
         piece_set: &TPieceSet,

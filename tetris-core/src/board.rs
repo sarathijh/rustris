@@ -1,3 +1,5 @@
+use crate::piece::{Piece, PieceSet};
+
 use super::position::Position;
 
 /// A Board is a collection of rows, each 10 columns wide
@@ -50,11 +52,12 @@ impl Board {
     /// Determines how far a piece can move in the given direction before it is obstructed
     pub fn piece_cast(
         &self,
-        units: [Position; 4],
-        offset: &Position,
+        piece_set: &dyn PieceSet,
+        piece: &Piece,
         direction: &Position,
     ) -> Position {
-        let mut position = *offset;
+        let units = piece_set.units(&piece.piece_type, &piece.rotation);
+        let mut position = piece.position;
         while !self.is_obstructed(units, &(position + *direction)) {
             position += *direction;
         }

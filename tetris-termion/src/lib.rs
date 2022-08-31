@@ -195,7 +195,7 @@ impl<TPieceSet: PieceSet> Renderer<TPieceSet> for TermionRenderer {
                         active_piece.piece_type,
                         active_piece.rotation,
                         to_render_position(&ghost_piece_position),
-                        "++",
+                        "##",
                         &mut render_ir,
                     );
                 }

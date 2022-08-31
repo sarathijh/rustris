@@ -116,19 +116,6 @@ impl<
         }
     }
 
-    fn spawn_piece(&mut self, piece_type: Option<PieceType>) {
-        self.active_piece = Some(Piece {
-            piece_type: if let Some(t) = piece_type {
-                t
-            } else {
-                self.queue.next()
-            },
-            rotation: Rotation::Up,
-            position: Position::new(4, 19),
-        });
-        self.update_ghost_piece_position();
-    }
-
     pub fn init(&mut self) {
         self.renderer.init();
         self.spawn_piece(None);
@@ -147,41 +134,78 @@ impl<
 
         for action in actions {
             match action {
-                Action::Pause => {
-                    // Already handled above
-                }
-                Action::MoveLeft => {
-                    self.move_active_piece(Position::left());
-                }
-                Action::MoveRight => {
-                    self.move_active_piece(Position::right());
-                }
+                Action::MoveLeft => self.move_active_piece(Position::left()),
+                Action::MoveRight => self.move_active_piece(Position::right()),
+                Action::RotateLeft => self.rotate_active_piece(Direction::CCW),
+                Action::RotateRight => self.rotate_active_piece(Direction::CW),
+                Action::Hold => self.hold_active_piece(),
+                Action::HardDrop => self.hard_drop_active_piece(),
                 Action::SoftDropStarted => self.gravity_feature.set_lines_per_second(50),
                 Action::SoftDropStopped => self.gravity_feature.set_lines_per_second(1),
-                Action::HardDrop => self.hard_drop_active_piece(),
-                Action::RotateLeft => {
-                    self.rotate_active_piece(Direction::CCW);
-                }
-                Action::RotateRight => {
-                    self.rotate_active_piece(Direction::CW);
-                }
-                Action::Hold => {
-                    // We can only hold if we have an active piece spawned
-                    if let Some(active_piece) = self.active_piece {
-                        if let Some(piece_to_spawn) =
-                            self.hold_feature.hold(active_piece.piece_type)
-                        {
-                            self.spawn_piece(piece_to_spawn);
-                        }
-                    }
+                Action::Pause => {
+                    // Already handled above
                 }
             };
         }
 
+        self.update_gravity(delta_time);
+    }
+
+    fn spawn_piece(&mut self, piece_type: Option<PieceType>) {
+        self.active_piece = Some(Piece {
+            piece_type: if let Some(t) = piece_type {
+                t
+            } else {
+                self.queue.next()
+            },
+            rotation: Rotation::Up,
+            position: Position::new(4, 19),
+        });
+        self.update_ghost_piece_position();
+    }
+
+    fn update_gravity(&mut self, delta_time: f64) {
         if let Some(_) = self.active_piece {
             let lines_to_drop = self.gravity_feature.update_drop(delta_time);
             if lines_to_drop > 0 {
                 self.move_active_piece(lines_to_drop * Position::down());
+            }
+        }
+    }
+
+    fn move_active_piece(&mut self, offset: Position) {
+        if let Some(mut active_piece) = self.active_piece {
+            let mut target_position = active_piece.position.clone();
+            target_position += offset;
+            if !self.board.is_obstructed(
+                self.piece_set
+                    .units(&active_piece.piece_type, &active_piece.rotation),
+                &target_position,
+            ) {
+                active_piece.position = target_position.clone();
+                self.active_piece = Some(active_piece);
+                self.update_ghost_piece_position();
+            }
+        }
+    }
+
+    fn rotate_active_piece(&mut self, direction: Direction) {
+        if let Some(active_piece) = self.active_piece {
+            if let Some(piece) = self
+                .piece_set
+                .rotate_piece(&self.board, &active_piece, direction)
+            {
+                self.active_piece = Some(piece);
+                self.update_ghost_piece_position();
+            }
+        }
+    }
+
+    fn hold_active_piece(&mut self) {
+        // We can only hold if we have an active piece spawned
+        if let Some(active_piece) = self.active_piece {
+            if let Some(piece_to_spawn) = self.hold_feature.hold(active_piece.piece_type) {
+                self.spawn_piece(piece_to_spawn);
             }
         }
     }
@@ -209,27 +233,6 @@ impl<
         }
     }
 
-    fn move_active_piece(&mut self, offset: Position) -> bool {
-        if let Some(mut active_piece) = self.active_piece {
-            let mut target_position = active_piece.position.clone();
-            target_position += offset;
-            if !self.board.is_obstructed(
-                self.piece_set
-                    .units(&active_piece.piece_type, &active_piece.rotation),
-                &target_position,
-            ) {
-                active_piece.position = target_position.clone();
-                self.active_piece = Some(active_piece);
-                self.update_ghost_piece_position();
-                true
-            } else {
-                false
-            }
-        } else {
-            false
-        }
-    }
-
     fn update_ghost_piece_position(&mut self) {
         self.ghost_piece_position = if let Some(active_piece) = self.active_piece {
             Some(
@@ -241,25 +244,8 @@ impl<
         };
     }
 
-    fn rotate_active_piece(&mut self, direction: Direction) -> bool {
-        if let Some(active_piece) = self.active_piece {
-            if let Some(piece) = self
-                .piece_set
-                .rotate_piece(&self.board, &active_piece, direction)
-            {
-                self.active_piece = Some(piece);
-                self.update_ghost_piece_position();
-                true
-            } else {
-                false
-            }
-        } else {
-            false
-        }
-    }
-
     pub fn render(&mut self) {
-        let render_state = RenderState::new(
+        self.renderer.render(RenderState::new(
             self.board.rows.to_vec(),
             &self.piece_set,
             self.active_piece,
@@ -267,8 +253,6 @@ impl<
             self.hold_feature.hold_piece_type,
             self.queue.next_items().to_vec(),
             self.paused,
-        );
-
-        self.renderer.render(render_state);
+        ));
     }
 }

@@ -22,19 +22,11 @@ const RIGHT_CONTENT_WIDTH: usize = 5;
 
 const LEFT_BORDER_WIDTH: usize = 1;
 const RIGHT_BORDER_WIDTH: usize = 1;
-const TOP_BORDER_HEIGHT: usize = 0;
+const TOP_BORDER_HEIGHT: usize = 1;
 const BOTTOM_BORDER_HEIGHT: usize = 2;
 
 const BOARD_WIDTH: usize = 10;
 const BOARD_HEIGHT: usize = 20;
-
-#[derive(Clone, Copy)]
-enum FillType {
-    Empty,
-    Field,
-    Filled,
-    Ghost,
-}
 
 pub struct TermionRenderer {
     stdout: RawTerminal<Stdout>,
@@ -112,45 +104,45 @@ impl<TPieceSet: PieceSet> Renderer<TPieceSet> for TermionRenderer {
             for col in 0..BOARD_WIDTH {
                 let filled = state.board_state[(BOARD_HEIGHT - 1) - row][col];
                 if filled {
-                    render_ir[[row, board_start_x + col * CELL_WIDTH]] = '[';
-                    render_ir[[row, board_start_x + col * CELL_WIDTH + 1]] = ']';
+                    render_ir[[board_start_y + row, board_start_x + col * CELL_WIDTH]] = '[';
+                    render_ir[[board_start_y + row, board_start_x + col * CELL_WIDTH + 1]] = ']';
                 } else {
-                    render_ir[[row, board_start_x + col * CELL_WIDTH]] = ' ';
-                    render_ir[[row, board_start_x + col * CELL_WIDTH + 1]] = '.';
+                    render_ir[[board_start_y + row, board_start_x + col * CELL_WIDTH]] = ' ';
+                    render_ir[[board_start_y + row, board_start_x + col * CELL_WIDTH + 1]] = '.';
                 }
             }
         }
 
         for row in 0..(BOARD_HEIGHT + 1) {
-            render_ir[[row, LEFT_CONTENT_WIDTH * CELL_WIDTH]] = '<';
-            render_ir[[row, LEFT_CONTENT_WIDTH * CELL_WIDTH + 1]] = '!';
+            render_ir[[board_start_y + row, LEFT_CONTENT_WIDTH * CELL_WIDTH]] = '<';
+            render_ir[[board_start_y + row, LEFT_CONTENT_WIDTH * CELL_WIDTH + 1]] = '!';
 
             render_ir[[
-                row,
+                board_start_y + row,
                 (LEFT_CONTENT_WIDTH + LEFT_BORDER_WIDTH + BOARD_WIDTH) * CELL_WIDTH,
             ]] = '!';
             render_ir[[
-                row,
+                board_start_y + row,
                 (LEFT_CONTENT_WIDTH + LEFT_BORDER_WIDTH + BOARD_WIDTH) * CELL_WIDTH + 1,
             ]] = '>';
         }
 
         for col in 0..BOARD_WIDTH {
             render_ir[[
-                BOARD_HEIGHT,
+                board_start_y + BOARD_HEIGHT,
                 (LEFT_CONTENT_WIDTH + LEFT_BORDER_WIDTH + col) * CELL_WIDTH,
             ]] = '=';
             render_ir[[
-                BOARD_HEIGHT,
+                board_start_y + BOARD_HEIGHT,
                 (LEFT_CONTENT_WIDTH + LEFT_BORDER_WIDTH + col) * CELL_WIDTH + 1,
             ]] = '=';
 
             render_ir[[
-                BOARD_HEIGHT + 1,
+                board_start_y + BOARD_HEIGHT + 1,
                 (LEFT_CONTENT_WIDTH + LEFT_BORDER_WIDTH + col) * CELL_WIDTH,
             ]] = '\\';
             render_ir[[
-                BOARD_HEIGHT + 1,
+                board_start_y + BOARD_HEIGHT + 1,
                 (LEFT_CONTENT_WIDTH + LEFT_BORDER_WIDTH + col) * CELL_WIDTH + 1,
             ]] = '/';
         }
@@ -173,7 +165,7 @@ impl<TPieceSet: PieceSet> Renderer<TPieceSet> for TermionRenderer {
                     (right_content_start_x
                         + CELL_WIDTH
                         + piece_type_center_offset_x(next_piece_type)) as i32,
-                    (3 + 3 * i) as i32,
+                    (board_start_y + 3 + 3 * i) as i32,
                 ),
                 "[]",
                 &mut render_ir,
@@ -186,7 +178,10 @@ impl<TPieceSet: PieceSet> Renderer<TPieceSet> for TermionRenderer {
                 state.piece_set,
                 hold_piece_type,
                 Rotation::Up,
-                Position::new(2 + piece_type_center_offset_x(hold_piece_type) as i32, 3),
+                Position::new(
+                    2 + piece_type_center_offset_x(hold_piece_type) as i32,
+                    board_start_y as i32 + 3,
+                ),
                 "[]",
                 &mut render_ir,
             );
@@ -216,15 +211,15 @@ impl<TPieceSet: PieceSet> Renderer<TPieceSet> for TermionRenderer {
             );
         }
 
-        render_ir[[0, 2]] = 'H';
-        render_ir[[0, 3]] = 'O';
-        render_ir[[0, 4]] = 'L';
-        render_ir[[0, 5]] = 'D';
+        render_ir[[board_start_y, 2]] = 'H';
+        render_ir[[board_start_y, 3]] = 'O';
+        render_ir[[board_start_y, 4]] = 'L';
+        render_ir[[board_start_y, 5]] = 'D';
 
-        render_ir[[0, right_content_start_x + 2]] = 'N';
-        render_ir[[0, right_content_start_x + 3]] = 'E';
-        render_ir[[0, right_content_start_x + 4]] = 'X';
-        render_ir[[0, right_content_start_x + 5]] = 'T';
+        render_ir[[board_start_y, right_content_start_x + 2]] = 'N';
+        render_ir[[board_start_y, right_content_start_x + 3]] = 'E';
+        render_ir[[board_start_y, right_content_start_x + 4]] = 'X';
+        render_ir[[board_start_y, right_content_start_x + 5]] = 'T';
 
         // Create a string builder for the final render
         let mut render = String::new();

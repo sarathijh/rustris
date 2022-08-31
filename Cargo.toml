@@ -3,11 +3,8 @@ name = "tetris"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
-termion = "1.5.5"
-game-loop = "0.9.1"
-rand = "0.6.0"
-keyboard_query = "0.1.0"
-ndarray = "0.15.6"
+tetris-core = { path = "tetris-core", version = "0.1.0" }
+tetris-srs = { path = "tetris-srs", version = "0.1.0" }
+tetris-termion = { path = "tetris-termion", version = "0.1.0" }
+tetris-keyboard_query = { path = "tetris-keyboard_query", version = "0.1.0" }

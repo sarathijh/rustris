@@ -1,0 +1,8 @@
+[package]
+name = "tetris-keyboard_query"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tetris-core = { path="../tetris-core" }
+keyboard_query = "0.1.0"

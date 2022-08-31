@@ -347,11 +347,43 @@ dependencies = [
 name = "tetris"
 version = "0.1.0"
 dependencies = [
+ "tetris-core",
+ "tetris-keyboard_query",
+ "tetris-srs",
+ "tetris-termion",
+]
+
+[[package]]
+name = "tetris-core"
+version = "0.1.0"
+dependencies = [
  "game-loop",
- "keyboard_query",
  "ndarray",
  "rand",
+]
+
+[[package]]
+name = "tetris-keyboard_query"
+version = "0.1.0"
+dependencies = [
+ "keyboard_query",
+ "tetris-core",
+]
+
+[[package]]
+name = "tetris-srs"
+version = "0.1.0"
+dependencies = [
+ "tetris-core",
+]
+
+[[package]]
+name = "tetris-termion"
+version = "0.1.0"
+dependencies = [
+ "ndarray",
  "termion",
+ "tetris-core",
 ]
 
 [[package]]

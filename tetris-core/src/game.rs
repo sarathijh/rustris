@@ -1,5 +1,3 @@
-use game_loop::game_loop;
-
 use super::{
     board::Board,
     input::{Action, InputActions},
@@ -10,30 +8,7 @@ use super::{
     renderer::{RenderState, Renderer},
 };
 
-pub fn tetris<
-    TPieceSet: PieceSet,
-    TRandom: Random<PieceType>,
-    TInputActions: InputActions,
-    TRenderer: Renderer<TPieceSet>,
->(
-    piece_set: TPieceSet,
-    queue: Queue<PieceType, TRandom>,
-    input_actions: TInputActions,
-    renderer: TRenderer,
-) {
-    let mut game = TetrisGame::new(piece_set, queue, input_actions, renderer);
-    game.start();
-
-    game_loop(
-        game,
-        60,
-        1.0,
-        |g| g.game.update(g.fixed_time_step()),
-        |g| g.game.render(),
-    );
-}
-
-struct TetrisGame<
+pub struct TetrisGame<
     TPieceSet: PieceSet,
     TRandom: Random<PieceType>,
     TInputActions,
@@ -58,7 +33,7 @@ impl<
         TRenderer: Renderer<TPieceSet>,
     > TetrisGame<TPieceSet, TRandom, TInputActions, TRenderer>
 {
-    fn new(
+    pub fn new(
         piece_set: TPieceSet,
         queue: Queue<PieceType, TRandom>,
         input_actions: TInputActions,
@@ -90,12 +65,12 @@ impl<
         });
     }
 
-    fn start(&mut self) {
+    pub fn start(&mut self) {
         self.renderer.init();
         self.spawn_piece(None);
     }
 
-    fn update(&mut self, delta_time: f64) {
+    pub fn update(&mut self, delta_time: f64) {
         let actions = self.input_actions.actions(delta_time);
         for action in actions {
             match action {
@@ -209,7 +184,7 @@ impl<
         }
     }
 
-    fn render(&mut self) {
+    pub fn render(&mut self) {
         let ghost_piece_position = if let Some(active_piece) = self.active_piece {
             Some(
                 self.board.piece_cast(

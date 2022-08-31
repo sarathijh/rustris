@@ -8,11 +8,11 @@ use termion::{
     raw::{IntoRawMode, RawTerminal},
 };
 
-use super::{
+use tetris_core::{
     piece::{PieceSet, PieceType, Rotation},
     renderer::Renderer,
 };
-use super::{position::Position, renderer::RenderState};
+use tetris_core::{position::Position, renderer::RenderState};
 
 const BOARD_WIDTH: usize = 10;
 const BOARD_VISIBLE_HEIGHT: usize = 20;

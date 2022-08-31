@@ -1,12 +1,14 @@
-use tetris::{
-    game::tetris, input::DasInputActions, keyboard_query::KeyboardQueryInputSource,
-    piece::PieceType, queue::Queue, random::RandomBag, srs::SrsPieceSet, termion::TermionRenderer,
-};
+extern crate tetris_core;
 
-mod tetris;
+use tetris_core::{
+    input::DasInputActions, piece::PieceType, queue::Queue, random::RandomBag, tetris_game,
+};
+use tetris_keyboard_query::KeyboardQueryInputSource;
+use tetris_srs::SrsPieceSet;
+use tetris_termion::TermionRenderer;
 
 fn main() {
-    tetris(
+    tetris_game(
         SrsPieceSet::new(),
         Queue::new(5, RandomBag::new(PieceType::all())),
         DasInputActions::new(

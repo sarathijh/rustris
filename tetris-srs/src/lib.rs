@@ -1,4 +1,4 @@
-use super::{
+use tetris_core::{
     board::Board,
     piece::{Direction, Piece, PieceSet, PieceType, Rotation},
     position::Position,

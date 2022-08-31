@@ -1,6 +1,6 @@
 use keyboard_query::{DeviceQuery, DeviceState};
 
-use super::input::{Input, InputSource};
+use tetris_core::input::{Input, InputSource};
 
 pub struct KeyboardQueryInputSource {
     device_state: DeviceState,

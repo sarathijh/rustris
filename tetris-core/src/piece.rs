@@ -1,6 +1,6 @@
 use super::{board::Board, position::Position};
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone)]
 pub enum PieceType {
     I,
     T,
@@ -25,17 +25,17 @@ impl PieceType {
     }
 }
 
+pub enum Direction {
+    CW,
+    CCW,
+}
+
 #[derive(Eq, PartialEq, Hash, Copy, Clone)]
 pub enum Rotation {
     Up,
     Right,
     Down,
     Left,
-}
-
-pub enum Direction {
-    CW,
-    CCW,
 }
 
 impl Rotation {
@@ -57,14 +57,14 @@ impl Rotation {
     }
 }
 
-pub trait PieceSet {
-    fn units(&self, piece_type: &PieceType, rotation: &Rotation) -> [Position; 4];
-    fn rotate_piece(&self, board: &Board, piece: &Piece, direction: Direction) -> Option<Piece>;
-}
-
 #[derive(Clone, Copy)]
 pub struct Piece {
     pub piece_type: PieceType,
     pub rotation: Rotation,
     pub position: Position,
+}
+
+pub trait PieceSet {
+    fn units(&self, piece_type: &PieceType, rotation: &Rotation) -> [Position; 4];
+    fn rotate_piece(&self, board: &Board, piece: &Piece, direction: Direction) -> Option<Piece>;
 }

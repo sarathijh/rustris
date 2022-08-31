@@ -103,7 +103,7 @@ impl<TPieceSet: PieceSet> Renderer<TPieceSet> for TermionRenderer {
         for row in 0..BOARD_HEIGHT {
             for col in 0..BOARD_WIDTH {
                 let filled = state.board_state[(BOARD_HEIGHT - 1) - row][col];
-                if filled {
+                if filled && !state.paused {
                     render_ir[[board_start_y + row, board_start_x + col * CELL_WIDTH]] = '[';
                     render_ir[[board_start_y + row, board_start_x + col * CELL_WIDTH + 1]] = ']';
                 } else {
@@ -154,61 +154,91 @@ impl<TPieceSet: PieceSet> Renderer<TPieceSet> for TermionRenderer {
             }
         }
 
-        // Render the queue of next pieces into the intermediate representation
-        for i in 0..state.next_piece_types.len() {
-            let next_piece_type = *state.next_piece_types.get(i).unwrap();
-            self.render_piece(
-                state.piece_set,
-                next_piece_type,
-                Rotation::Up,
-                Position::new(
-                    (right_content_start_x
-                        + CELL_WIDTH
-                        + piece_type_center_offset_x(next_piece_type)) as i32,
-                    (board_start_y + 3 + 3 * i) as i32,
-                ),
-                "[]",
-                &mut render_ir,
-            );
-        }
-
-        // Render the hold piece into the intermediate representation
-        if let Some(hold_piece_type) = state.hold_piece_type {
-            self.render_piece(
-                state.piece_set,
-                hold_piece_type,
-                Rotation::Up,
-                Position::new(
-                    2 + piece_type_center_offset_x(hold_piece_type) as i32,
-                    board_start_y as i32 + 3,
-                ),
-                "[]",
-                &mut render_ir,
-            );
-        }
-
-        if let Some(active_piece) = state.active_piece {
-            // Render the ghost piece into the intermediate representation
-            if let Some(ghost_piece_position) = state.ghost_piece_position {
+        if !state.paused {
+            // Render the queue of next pieces into the intermediate representation
+            for i in 0..state.next_piece_types.len() {
+                let next_piece_type = *state.next_piece_types.get(i).unwrap();
                 self.render_piece(
                     state.piece_set,
-                    active_piece.piece_type,
-                    active_piece.rotation,
-                    to_render_position(&ghost_piece_position),
-                    "++",
+                    next_piece_type,
+                    Rotation::Up,
+                    Position::new(
+                        (right_content_start_x
+                            + CELL_WIDTH
+                            + piece_type_center_offset_x(next_piece_type))
+                            as i32,
+                        (board_start_y + 3 + 3 * i) as i32,
+                    ),
+                    "[]",
                     &mut render_ir,
                 );
             }
 
-            // Render the active piece into the intermediate representation
-            self.render_piece(
-                state.piece_set,
-                active_piece.piece_type,
-                active_piece.rotation,
-                to_render_position(&active_piece.position),
-                "[]",
-                &mut render_ir,
-            );
+            // Render the hold piece into the intermediate representation
+            if let Some(hold_piece_type) = state.hold_piece_type {
+                self.render_piece(
+                    state.piece_set,
+                    hold_piece_type,
+                    Rotation::Up,
+                    Position::new(
+                        2 + piece_type_center_offset_x(hold_piece_type) as i32,
+                        board_start_y as i32 + 3,
+                    ),
+                    "[]",
+                    &mut render_ir,
+                );
+            }
+
+            if let Some(active_piece) = state.active_piece {
+                // Render the ghost piece into the intermediate representation
+                if let Some(ghost_piece_position) = state.ghost_piece_position {
+                    self.render_piece(
+                        state.piece_set,
+                        active_piece.piece_type,
+                        active_piece.rotation,
+                        to_render_position(&ghost_piece_position),
+                        "++",
+                        &mut render_ir,
+                    );
+                }
+
+                // Render the active piece into the intermediate representation
+                self.render_piece(
+                    state.piece_set,
+                    active_piece.piece_type,
+                    active_piece.rotation,
+                    to_render_position(&active_piece.position),
+                    "[]",
+                    &mut render_ir,
+                );
+            }
+        }
+
+        if state.paused {
+            render_ir[[
+                board_start_y + (BOARD_HEIGHT * CELL_HEIGHT) / 2,
+                board_start_x + (BOARD_WIDTH * CELL_WIDTH) / 2 - 3,
+            ]] = 'P';
+            render_ir[[
+                board_start_y + (BOARD_HEIGHT * CELL_HEIGHT) / 2,
+                board_start_x + (BOARD_WIDTH * CELL_WIDTH) / 2 - 3 + 1,
+            ]] = 'A';
+            render_ir[[
+                board_start_y + (BOARD_HEIGHT * CELL_HEIGHT) / 2,
+                board_start_x + (BOARD_WIDTH * CELL_WIDTH) / 2 - 3 + 2,
+            ]] = 'U';
+            render_ir[[
+                board_start_y + (BOARD_HEIGHT * CELL_HEIGHT) / 2,
+                board_start_x + (BOARD_WIDTH * CELL_WIDTH) / 2 - 3 + 3,
+            ]] = 'S';
+            render_ir[[
+                board_start_y + (BOARD_HEIGHT * CELL_HEIGHT) / 2,
+                board_start_x + (BOARD_WIDTH * CELL_WIDTH) / 2 - 3 + 4,
+            ]] = 'E';
+            render_ir[[
+                board_start_y + (BOARD_HEIGHT * CELL_HEIGHT) / 2,
+                board_start_x + (BOARD_WIDTH * CELL_WIDTH) / 2 - 3 + 5,
+            ]] = 'D';
         }
 
         render_ir[[board_start_y, 2]] = 'H';

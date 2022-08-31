@@ -24,6 +24,7 @@ pub struct TetrisGame<
     drop_timer: f64,
     lines_per_second: i32,
     renderer: TRenderer,
+    paused: bool,
 }
 
 impl<
@@ -50,6 +51,7 @@ impl<
             drop_timer: 0f64,
             lines_per_second: 1,
             renderer,
+            paused: false,
         }
     }
 
@@ -72,8 +74,20 @@ impl<
 
     pub fn update(&mut self, delta_time: f64) {
         let actions = self.input_actions.actions(delta_time);
+
+        if actions.contains(&Action::Pause) {
+            self.paused = !self.paused;
+        }
+
+        if self.paused {
+            return;
+        }
+
         for action in actions {
             match action {
+                Action::Pause => {
+                    // Already handled above
+                }
                 Action::MoveLeft => {
                     self.move_active_piece(Position::new(-1, 0));
                 }
@@ -205,6 +219,7 @@ impl<
             ghost_piece_position,
             self.hold_piece_type,
             self.queue.next_items().to_vec(),
+            self.paused,
         );
 
         self.renderer.render(render_state);

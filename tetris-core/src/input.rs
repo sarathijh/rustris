@@ -11,6 +11,7 @@ pub enum Input {
     RotateRight,
     HardDrop,
     Hold,
+    Pause,
 }
 
 /// A source that generates raw input events
@@ -29,6 +30,7 @@ pub enum Action {
     RotateLeft,
     RotateRight,
     Hold,
+    Pause,
 }
 
 /// A source that generates input actions
@@ -118,6 +120,9 @@ impl<TInputSource: InputSource> InputActions for DasInputActions<TInputSource> {
         }
         if inputs.contains(&Input::Hold) {
             actions.push(Action::Hold);
+        }
+        if inputs.contains(&Input::Pause) {
+            actions.push(Action::Pause);
         }
         if self.holding_left {
             let count = self.handle_auto_shift_timer(delta_time);

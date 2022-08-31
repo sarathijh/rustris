@@ -59,6 +59,9 @@ impl InputSource for KeyboardQueryInputSource {
             if self.is_press(&keys, 56) {
                 inputs.push(Input::Hold);
             }
+            if self.is_press(&keys, 36) {
+                inputs.push(Input::Pause);
+            }
         }
         self.prev_keys = keys;
         inputs

@@ -12,6 +12,7 @@ pub struct RenderState<'a, TPieceSet: PieceSet> {
     pub ghost_piece_position: Option<Position>,
     pub hold_piece_type: Option<PieceType>,
     pub next_piece_types: Vec<PieceType>,
+    pub paused: bool,
 }
 
 impl<'a, TPieceSet: PieceSet> RenderState<'a, TPieceSet> {
@@ -22,6 +23,7 @@ impl<'a, TPieceSet: PieceSet> RenderState<'a, TPieceSet> {
         ghost_piece_position: Option<Position>,
         hold_piece_type: Option<PieceType>,
         next_piece_types: Vec<PieceType>,
+        paused: bool,
     ) -> Self {
         Self {
             board_state,
@@ -30,6 +32,7 @@ impl<'a, TPieceSet: PieceSet> RenderState<'a, TPieceSet> {
             ghost_piece_position,
             hold_piece_type,
             next_piece_types,
+            paused,
         }
     }
 }

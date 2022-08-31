@@ -1,3 +1,4 @@
+/// The types of raw input events we care about
 #[derive(Eq, PartialEq)]
 pub enum Input {
     LeftPress,
@@ -12,10 +13,12 @@ pub enum Input {
     Hold,
 }
 
+/// A source that generates raw input events
 pub trait InputSource {
     fn inputs(&mut self) -> Vec<Input>;
 }
 
+/// Higher-level input actions that change the game state
 #[derive(Eq, PartialEq)]
 pub enum Action {
     MoveLeft,
@@ -28,10 +31,17 @@ pub enum Action {
     Hold,
 }
 
+/// A source that generates input actions
 pub trait InputActions {
     fn actions(&mut self, delta_time: f64) -> Vec<Action>;
 }
 
+/// An implementation of InputActions that uses Delayed Auto Shift (DAS)
+///
+/// If a movement key is pressed, a move action will be generated once.
+/// If the movement key is continually held for longer than [delayed_auto_shift] seconds,
+/// a second move action will be generated. Further move actions will be generated every
+/// [auto_repeat_rate] seconds until the key is released.
 pub struct DasInputActions<TInputSource: InputSource> {
     input_source: TInputSource,
     delayed_auto_shift: f64,

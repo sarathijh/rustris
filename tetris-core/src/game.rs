@@ -65,7 +65,7 @@ impl<
         });
     }
 
-    pub fn start(&mut self) {
+    pub fn init(&mut self) {
         self.renderer.init();
         self.spawn_piece(None);
     }

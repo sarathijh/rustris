@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+game-loop = "0.9.1"
 tetris-core = { path = "tetris-core", version = "0.1.0" }
 tetris-srs = { path = "tetris-srs", version = "0.1.0" }
 tetris-termion = { path = "tetris-termion", version = "0.1.0" }

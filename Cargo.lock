@@ -347,6 +347,7 @@ dependencies = [
 name = "tetris"
 version = "0.1.0"
 dependencies = [
+ "game-loop",
  "tetris-core",
  "tetris-keyboard_query",
  "tetris-srs",
@@ -357,7 +358,6 @@ dependencies = [
 name = "tetris-core"
 version = "0.1.0"
 dependencies = [
- "game-loop",
  "ndarray",
  "rand",
 ]

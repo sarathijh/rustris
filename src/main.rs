@@ -2,12 +2,8 @@ extern crate rustris_core;
 
 use game_loop::game_loop;
 use rustris_core::{
-    game::Rustris,
-    input::DasInputActions,
-    piece::PieceType,
-    queue::Queue,
-    random::RandomBag,
-    twist::{AllTwistDetector, ThreeCornerTTwistDetector},
+    game::Rustris, input::DasInputActions, piece::PieceType, queue::Queue, random::RandomBag,
+    twist::AllTwistDetector,
 };
 use rustris_keyboard_query::KeyboardQueryInputSource;
 use rustris_srs::SrsPieceSet;
@@ -20,6 +16,7 @@ fn main() {
     // - A random bag generator
     // - Delayed Auto Shift (DAS) input
     // - An input source implementation that uses the keyboard_query crate
+    // - A twist detector that detects all twists for all piece types
     // - A rendering implementation that uses the termion crate
     let mut game = Rustris::new(
         SrsPieceSet,

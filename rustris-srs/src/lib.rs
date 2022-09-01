@@ -4,8 +4,7 @@ use rustris_core::{
     position::Position,
 };
 
-pub struct SrsPieceSet {}
-
+pub struct SrsPieceSet;
 impl SrsPieceSet {
     pub fn new() -> Self {
         Self {}
@@ -37,7 +36,7 @@ impl PieceSet for SrsPieceSet {
 
             if !board.is_obstructed(
                 self.units(&piece.piece_type, target_rotation),
-                &target_position,
+                target_position,
             ) {
                 return Some(Piece {
                     piece_type: piece.piece_type,

@@ -19,6 +19,10 @@ impl Position {
         Self { x: 1, y: 0 }
     }
 
+    pub fn up() -> Self {
+        Self { x: 0, y: 1 }
+    }
+
     pub fn down() -> Self {
         Self { x: 0, y: -1 }
     }

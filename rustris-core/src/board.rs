@@ -23,9 +23,9 @@ impl Board {
     }
 
     /// Adds the piece's units permanently to the board
-    pub fn lock_piece(&mut self, units: [Position; 4], offset: &Position) -> usize {
+    pub fn lock_piece(&mut self, units: [Position; 4], offset: Position) -> usize {
         for unit in units {
-            let position = unit + *offset;
+            let position = unit + offset;
             self.rows[position.y as usize][position.x as usize] = true;
         }
 
@@ -60,29 +60,29 @@ impl Board {
     pub fn piece_cast(
         &self,
         piece_set: &dyn PieceSet,
-        piece: &Piece,
-        direction: &Position,
+        piece: Piece,
+        direction: Position,
     ) -> Position {
         let units = piece_set.units(&piece.piece_type, &piece.rotation);
         let mut position = piece.position;
-        while !self.is_obstructed(units, &(position + *direction)) {
-            position += *direction;
+        while !self.is_obstructed(units, position + direction) {
+            position += direction;
         }
         position
     }
 
     /// Returns true if any unit of the piece is occupying a filled space on the board
     /// or is outside the bounds of the board
-    pub fn is_obstructed(&self, units: [Position; 4], offset: &Position) -> bool {
-        for position in units {
-            let cell = position + offset.clone();
-            if cell.x < 0 || cell.x >= 10 || cell.y < 0 || cell.y >= 40 {
-                return true;
-            }
-            if self.rows[cell.y as usize][cell.x as usize] {
-                return true;
-            }
+    pub fn is_obstructed(&self, units: [Position; 4], position: Position) -> bool {
+        return units
+            .iter()
+            .any(|unit_offset| self.is_filled(position + *unit_offset));
+    }
+
+    pub fn is_filled(&self, position: Position) -> bool {
+        if !(0..10).contains(&position.x) || !(0..40).contains(&position.y) {
+            return true;
         }
-        return false;
+        return self.rows[position.y as usize][position.x as usize];
     }
 }

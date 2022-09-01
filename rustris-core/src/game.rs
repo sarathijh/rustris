@@ -1,3 +1,5 @@
+use crate::twist::TwistDetector;
+
 use super::{
     board::Board,
     input::{Action, InputActions},
@@ -90,6 +92,7 @@ pub struct Rustris<
     TRandom: Random<PieceType>,
     TInputActions,
     TRenderer: Renderer<TPieceSet>,
+    TTwistDetector: TwistDetector<TPieceSet>,
 > {
     board: Board,
     piece_set: TPieceSet,
@@ -99,6 +102,7 @@ pub struct Rustris<
     input_actions: TInputActions,
     hold_feature: HoldFeature,
     gravity_feature: GravityFeature,
+    twist_detector: TTwistDetector,
     renderer: TRenderer,
     paused: bool,
     messages: Vec<Message>,
@@ -109,12 +113,14 @@ impl<
         TRandom: Random<PieceType>,
         TInputActions: InputActions,
         TRenderer: Renderer<TPieceSet>,
-    > Rustris<TPieceSet, TRandom, TInputActions, TRenderer>
+        TTwistDetector: TwistDetector<TPieceSet>,
+    > Rustris<TPieceSet, TRandom, TInputActions, TRenderer, TTwistDetector>
 {
     pub fn new(
         piece_set: TPieceSet,
         queue: Queue<PieceType, TRandom>,
         input_actions: TInputActions,
+        twist_detector: TTwistDetector,
         renderer: TRenderer,
     ) -> Self {
         Rustris {
@@ -126,6 +132,7 @@ impl<
             input_actions,
             hold_feature: HoldFeature::new(),
             gravity_feature: GravityFeature::new(1),
+            twist_detector,
             renderer,
             paused: false,
             messages: vec![],
@@ -196,7 +203,7 @@ impl<
             if !self.board.is_obstructed(
                 self.piece_set
                     .units(&active_piece.piece_type, &active_piece.rotation),
-                &target_position,
+                target_position,
             ) {
                 active_piece.position = target_position.clone();
                 self.active_piece = Some(active_piece);
@@ -230,7 +237,7 @@ impl<
         if let Some(mut active_piece) = self.active_piece {
             active_piece.position =
                 self.board
-                    .piece_cast(&self.piece_set, &active_piece, &Position::down());
+                    .piece_cast(&self.piece_set, active_piece, Position::down());
             self.active_piece = Some(active_piece);
             self.update_ghost_piece_position();
             self.lock_active_piece();
@@ -239,15 +246,36 @@ impl<
 
     fn lock_active_piece(&mut self) {
         if let Some(active_piece) = self.active_piece {
+            let is_twist =
+                self.twist_detector
+                    .is_twist(&self.board, &self.piece_set, &active_piece);
+
             let lines_cleared = self.board.lock_piece(
                 self.piece_set
                     .units(&active_piece.piece_type, &active_piece.rotation),
-                &active_piece.position,
+                active_piece.position,
             );
             match lines_cleared {
-                1 => self.messages.push(Message::Single),
-                2 => self.messages.push(Message::Double),
-                3 => self.messages.push(Message::Triple),
+                0 => {
+                    if is_twist {
+                        self.messages.push(Message::Twist(active_piece.piece_type))
+                    }
+                }
+                1 => self.messages.push(if is_twist {
+                    Message::TwistSingle(active_piece.piece_type)
+                } else {
+                    Message::Single
+                }),
+                2 => self.messages.push(if is_twist {
+                    Message::TwistDouble(active_piece.piece_type)
+                } else {
+                    Message::Double
+                }),
+                3 => self.messages.push(if is_twist {
+                    Message::TwistTriple(active_piece.piece_type)
+                } else {
+                    Message::Triple
+                }),
                 4 => self.messages.push(Message::Quad),
                 _ => (),
             };
@@ -263,7 +291,7 @@ impl<
         self.ghost_piece_position = if let Some(active_piece) = self.active_piece {
             Some(
                 self.board
-                    .piece_cast(&self.piece_set, &active_piece, &Position::down()),
+                    .piece_cast(&self.piece_set, active_piece, Position::down()),
             )
         } else {
             None

@@ -2,7 +2,12 @@ extern crate rustris_core;
 
 use game_loop::game_loop;
 use rustris_core::{
-    game::Rustris, input::DasInputActions, piece::PieceType, queue::Queue, random::RandomBag,
+    game::Rustris,
+    input::DasInputActions,
+    piece::PieceType,
+    queue::Queue,
+    random::RandomBag,
+    twist::{AllTwistDetector, ThreeCornerTTwistDetector},
 };
 use rustris_keyboard_query::KeyboardQueryInputSource;
 use rustris_srs::SrsPieceSet;
@@ -17,13 +22,14 @@ fn main() {
     // - An input source implementation that uses the keyboard_query crate
     // - A rendering implementation that uses the termion crate
     let mut game = Rustris::new(
-        SrsPieceSet::new(),
+        SrsPieceSet,
         Queue::new(5, RandomBag::new(PieceType::all())),
         DasInputActions::new(
             KeyboardQueryInputSource::new(),
             0.18333333333,
             0.03333333333,
         ),
+        AllTwistDetector,
         TermionRenderer::new(),
     );
 
